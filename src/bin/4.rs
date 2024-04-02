@@ -2,11 +2,19 @@ use std::collections::HashMap;
 use std::time::Instant;
 use adventofcode2016::aoc_reader;
 
+static ASCII_LOWER: [char; 26] = [
+    'a', 'b', 'c', 'd', 'e',
+    'f', 'g', 'h', 'i', 'j',
+    'k', 'l', 'm', 'n', 'o',
+    'p', 'q', 'r', 's', 't',
+    'u', 'v', 'w', 'x', 'y',
+    'z',
+];
+
 fn main() {
     let content = aoc_reader(4);
     let start = Instant::now(); // skip file IO in timing
-    let result1 = sector_sum(&content);
-    let result2 = 0;
+    let (result1, result2) = sector_sum(&content);
     let duration = start.elapsed();
     println!(
         "Part 1 result: {result1}\n\
@@ -15,20 +23,24 @@ fn main() {
     println!("Execution took {:?}", duration)
 }
 
-fn sector_sum(data: &str) -> u32 {
+fn sector_sum(data: &str) -> (u32, u32) {
     let mut real_ids = 0;
+    let mut north_pole_id: u32 =0;
     for line in data.lines() {
         let sector = Sector::from_string(line);
 
-        if sector.checksum == most_common_chars(sector.name) {
+        if sector.checksum == most_common_chars(&sector.name) {
             real_ids += sector.id;
+            if north_pole_id == 0 && sector.decrypted().contains("northpole") {
+                north_pole_id = sector.id.clone();
+            }
         }
     }
-    real_ids
+    (real_ids, north_pole_id)
 }
 
 
-fn most_common_chars(string: String) -> String {
+fn most_common_chars(string: &String) -> String {
     let mut letter_counts: HashMap<char,i32> = HashMap::new();
     for c in string.chars() {
         *letter_counts.entry(c).or_insert(0) += 1;
@@ -65,4 +77,14 @@ impl Sector {
             checksum
         }
     }
+
+    fn decrypted(&self) -> String {
+        let mut decrypted_chars: Vec<char> = vec![];
+        for char in self.name.chars() {
+            let index = (ASCII_LOWER.iter().position( |x| x == &char).unwrap() + self.id as usize) % ASCII_LOWER.len();
+            decrypted_chars.push(ASCII_LOWER[index]);
+        }
+        decrypted_chars.iter().collect()
+    }
 }
+
