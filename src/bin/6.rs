@@ -1,7 +1,7 @@
 use std::time::Instant;
 use adventofcode2016::aoc_reader;
 use std::collections::HashMap;
-use itertools::enumerate;
+use std::iter::zip;
 
 fn main() {
     let content = aoc_reader(6);
@@ -18,8 +18,8 @@ fn main() {
 fn repeated_message(data: &str) -> (String, String) {
     let mut counters: Vec<HashMap<char,i32>> = vec![HashMap::new();data.lines().next().unwrap().len()];
     for line in data.lines() {
-        for (index, char) in enumerate(line.chars()) {
-            *counters[index].entry(char).or_insert(0) += 1;
+        for (counter, char) in zip(counters.iter_mut(), line.chars()) {
+            *counter.entry(char).or_insert(0) += 1;
         }
     }
     let mut most_common_chars = vec![];
