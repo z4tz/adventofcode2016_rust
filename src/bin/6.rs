@@ -16,6 +16,7 @@ fn main() {
 }
 
 fn repeated_message(data: &str) -> (String, String) {
+
     let mut counters: Vec<HashMap<char,i32>> = vec![HashMap::new();data.lines().next().unwrap().len()];
     for line in data.lines() {
         for (counter, char) in zip(counters.iter_mut(), line.chars()) {
